@@ -22,6 +22,10 @@ class WPUIPH_Data_Store {
 	}
 
 	public function update_history_for_current_user() {
+		if ( ! is_user_logged_in() ) {
+			return;
+		}
+
 		$current_time = current_time( 'timestamp' );
 		$current_date = date( 'Y-m-d', $current_time );
 
