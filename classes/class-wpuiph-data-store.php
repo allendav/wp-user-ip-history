@@ -19,6 +19,8 @@ class WPUIPH_Data_Store {
 
 	protected function __construct() {
 		add_action( 'init', array( $this, 'update_history_for_current_user' ) );
+
+		add_filter( 'privacy_policy_section', array( $this, 'get_privacy_policy_section' ), 10, 2 );
 	}
 
 	public function update_history_for_current_user() {
@@ -61,6 +63,49 @@ class WPUIPH_Data_Store {
 		}
 
 		return $user_history_meta;
+	}
+
+	public function get_privacy_policy_section( $content, $name ) {
+		if ( ! is_array( $content ) ) {
+			$content = array();
+		}
+
+		if ( 'privacy-what-personal-data-collected' === $name ) {
+			$content[] = __( 'We collect your IP address when you visit this website <strong>but only if you are logged in</strong>.', 'wpuiph' );
+		}
+
+		if ( 'privacy-why-personal-data-collected' === $name ) {
+			$content[] = __( 'We store a list of the IP addresses you use to access this website as a guard against unauthorized access to your account.', 'wpuiph' );
+		}
+
+		if ( 'privacy-sharing-personal-data' === $name ) {
+			$content[] = __( 'We never share your IP address history with others.', 'wpuiph' );
+		}
+
+		if ( 'privacy-storing-personal-data' === $name ) {
+			$content[] = __( 'We store your IP address history in a database on this server. Only administrators can see your IP address history, and we require all administrator accounts to use strong passwords.', 'wpuiph' );
+		}
+
+		if ( 'privacy-retaining-personal-data' === $name ) {
+			$content[] = __( 'We retain your IP address history forever, or until you request it to be deleted.', 'wpuiph' );
+		}
+
+		if ( 'privacy-user-options-personal-data' === $name ) {
+			$content[] = __( 'You cannot opt-out of us collecting your IP address.', 'wpuiph' );
+		}
+
+		if ( 'privacy-user-managing-personal-data' === $name ) {
+			if ( is_user_logged_in() ) {
+				$content[] = sprintf(
+					__( 'You may view your own IP address history in your <a href="%s">User Profile</a> at any time, and you may request deletion of the history at any time.', 'wpuiph' ),
+					admin_url( 'profile.php' )
+				);
+			} else {
+				$content[] = __( 'You may view your own IP address history in your User Profile at any time, and you may request deletion of the history at any time.', 'wpuiph' );
+			}
+		}
+
+		return $content;
 	}
 
 }
